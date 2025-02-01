@@ -122,6 +122,9 @@ const draw = () => {
       block.style.cursor = "pointer";
       block.id = `block-${index}`;
 
+      blockValues[index].isHide = false;
+      blockValues[index].isOpen = false;
+
       if (isStart) {
         block.addEventListener("click", () => {
           if (el.isOpen || turns.length == 2) return;
