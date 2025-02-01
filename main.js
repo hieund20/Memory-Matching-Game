@@ -99,8 +99,8 @@ const blockValues = [
 ];
 const turns = [];
 let isStart = false;
-let isFinish = false;
 const responsive = window.matchMedia("(min-width: 768px)");
+let countDownTimer;
 
 const blocks = document.createElement("div");
 blocks.className = "blocks-container";
@@ -116,7 +116,7 @@ const draw = () => {
     .forEach((el, index) => {
       const block = document.createElement("div");
       block.style.width = "100%";
-      block.style.height = responsive.matches ? "100px" : "auto";
+      block.style.height = responsive.matches ? "100px" : "80px";
       block.style.border = "1px solid black";
       block.style.borderRadius = "4px";
       block.style.cursor = "pointer";
@@ -152,18 +152,48 @@ const removeBlocks = () => {
   });
 };
 
+const countDown = document.getElementById("timer");
+countDown.innerText = 100;
+
 const startButton = document.getElementById("start-btn");
 startButton.style.padding = "16px";
 startButton.style.cursor = "pointer";
 startButton.style.width = "100%";
 startButton.style.maxWidth = "420px";
-startButton.style.marginTop = "16px"
+startButton.style.marginTop = "16px";
 
 startButton.addEventListener("click", () => {
   isStart = true;
   startButton.disabled = true;
   removeBlocks();
   draw();
+
+  clearInterval(countDownTimer);
+  countDown.innerText = 100;
+
+  countDownTimer = setInterval(() => {
+    if (!isStart) return;
+    countDown.innerText -= 1;
+
+    if (checkFinish()) {
+      alert("Finished!");
+      clearInterval(countDownTimer);
+      isStart = false;
+      startButton.disabled = false;
+      removeBlocks();
+      draw();
+      return;
+    }
+
+    if (Number.parseInt(countDown.innerText) === 0) {
+      clearInterval(countDownTimer);
+      alert("Time's up");
+      isStart = false;
+      startButton.disabled = false;
+      removeBlocks();
+      draw();
+    }
+  }, 1000);
 });
 
 const checkSameBlockAndHide = () => {
@@ -194,15 +224,11 @@ const checkSameBlockAndHide = () => {
   turns.splice(0, turns.length);
 };
 
-const countDown = document.getElementById("timer");
-countDown.innerText = 100;
-
-const timerCountDown = setInterval(() => {
-  if (!isStart) return;
-  countDown.innerText -= 1;
-
-  if (countDown.innerText === 0) {
-    clearInterval(timerCountDown);
-    alert("Time's up");
+const checkFinish = () => {
+  for (let i = 0; i < blockValues.length; i++) {
+    if (!blockValues[i].isHide) {
+      return false;
+    }
   }
-}, 1000);
+  return true;
+};
